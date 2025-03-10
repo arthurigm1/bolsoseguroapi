@@ -20,4 +20,8 @@ public class Categoria {
 
     @Column(nullable = false, unique = true, length = 50)
     private String nome;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 }

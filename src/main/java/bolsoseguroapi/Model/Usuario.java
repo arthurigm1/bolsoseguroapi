@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -34,14 +35,31 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
-    @Column(unique = true)
-    private String cpf;
-    @Column
-    private LocalDate dataNascimento;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "conta_inicial_id")
+    private Conta contaInicial;
+
+    @Column(nullable = false)
+    private BigDecimal saldoGeral = BigDecimal.ZERO;  // Saldo geral de todas as contas
+
 
     private String verificationCode;
 
     private boolean enabled;
+
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Conta> contas; // Relacionamento com contas cadastradas
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Cartao> cartoes; // Relacionamento com cartões cadastrados
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Transacao> transacoes; // Relacionamento com transações realizadas
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<Categoria> categorias;
+
     @Enumerated(EnumType.STRING)
     private UsuarioRole role;
 

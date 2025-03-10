@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -28,12 +29,16 @@ public class Conta {
     @Column(nullable = false, length = 50)
     private String banco;
 
-    @Column(nullable = false, length = 10)
-    private String agencia;
-
-    @Column(nullable = false, unique = true, length = 20)
-    private String numeroConta;
 
     @Column(nullable = false)
     private BigDecimal saldo = BigDecimal.ZERO;
+
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
+    private List<Despesa> despesas;
+
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
+    private List<Receita> receitas;
+
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
+    private List<Transferencia> transferencias;
 }

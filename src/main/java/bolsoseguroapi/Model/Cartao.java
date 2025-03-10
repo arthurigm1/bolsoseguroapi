@@ -1,6 +1,5 @@
 package bolsoseguroapi.Model;
 
-import bolsoseguroapi.Model.Enum.TipoCartao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,15 +27,10 @@ public class Cartao {
     @Column(nullable = false, length = 50)
     private String nome;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TipoCartao tipoCartao;
-
     @Column
     private BigDecimal limite;
 
-    @Column
-    private BigDecimal saldoAtual;
+
 
 
 }

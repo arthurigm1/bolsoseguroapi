@@ -4,6 +4,7 @@ package bolsoseguroapi.Service;
 import bolsoseguroapi.Config.TokenService;
 import bolsoseguroapi.Dto.Usuario.*;
 import bolsoseguroapi.Exceptions.RegistroException;
+import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Enum.UsuarioRole;
 import bolsoseguroapi.Repository.UsuarioRepository;
 
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -53,7 +55,15 @@ public class AuthService {
         String randomCode = RandomString.generateRandomString(64);
         newUser.setVerificationCode(randomCode);
         newUser.setEnabled(false);
+
+        Conta contaInicial = new Conta();
+        contaInicial.setBanco("Conta Inicial");
+        contaInicial.setSaldo(BigDecimal.ZERO);
+        contaInicial.setUsuario(newUser);
+        newUser.setContaInicial(contaInicial);
+
         Usuario savedUser = repository.save(newUser);
+
        /* try {
             mailService.sendVerificationEmail(savedUser);
         } catch (MessagingException | UnsupportedEncodingException e) {
