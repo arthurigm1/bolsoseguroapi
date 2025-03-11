@@ -1,5 +1,6 @@
 package bolsoseguroapi.Model;
 
+
 import bolsoseguroapi.Model.Enum.UsuarioRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,12 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private BigDecimal saldoGeral = BigDecimal.ZERO;  // Saldo geral de todas as contas
 
+    @Transient
+    public BigDecimal getSaldoGeral() {
+        return contas.stream()
+                .map(Conta::getSaldo)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
     private String verificationCode;
 

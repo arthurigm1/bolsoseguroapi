@@ -27,8 +27,10 @@ public class Cartao {
     @Column(nullable = false, length = 50)
     private String nome;
 
-    @Column
-    private BigDecimal limite;
+    private BigDecimal limiteDisponivel;
+
+    private BigDecimal faturaAtual = BigDecimal.ZERO;
+
 
 
 

@@ -22,6 +22,14 @@ public class Categoria {
     private String nome;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "usuario_id", nullable = true)
     private Usuario usuario;
+
+    private boolean fixa;
+
+    public Categoria(String nome, boolean fixa) {
+        this.nome = nome;
+        this.fixa = fixa;
+    }
+
 }
