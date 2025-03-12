@@ -25,4 +25,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body("Você já atingiu o limite de categorias personalizadas (5).");
     }
+
+    @ExceptionHandler(ErroException.class)
+    public ResponseEntity<String> handleErroException(ErroException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
 }
