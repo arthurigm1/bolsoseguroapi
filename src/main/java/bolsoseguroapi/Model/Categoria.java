@@ -32,4 +32,5 @@ public class Categoria {
         this.fixa = fixa;
     }
 
+
 }

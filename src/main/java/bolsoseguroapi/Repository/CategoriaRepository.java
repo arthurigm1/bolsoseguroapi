@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface CategoriaRepository extends JpaRepository<Categoria, UUID  > {
+public interface CategoriaRepository extends JpaRepository<Categoria, Long  > {
     List<Categoria> findAllByNomeIn(List<String> nomes);
 
     long countByUsuario(Usuario usuario);
@@ -25,4 +25,6 @@ public interface CategoriaRepository extends JpaRepository<Categoria, UUID  > {
 
 
     List<Categoria> findCategoriasPersonalizadasByUsuarioId(UUID usuarioId);
+
+
 }
