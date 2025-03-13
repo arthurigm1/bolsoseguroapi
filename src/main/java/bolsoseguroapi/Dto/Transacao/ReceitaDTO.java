@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public record ReceitaDTO(
         BigDecimal valor,
-        LocalDate date,
+        LocalDate data,
         String  categoria,
         String descricao,
         UUID contaId

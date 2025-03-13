@@ -37,7 +37,7 @@ public class AuthService {
         }
         if (passwordEncoder.matches(body.senha(), user.getSenha())) {
             String token = this.tokenService.generateToken(user);
-            return new SuccessResponseDto(user.getEmail(), token, user.getId());
+            return new SuccessResponseDto(user.getEmail(), token);
         }
         return new ErrorResponseDto("Senha incorreta");
     }

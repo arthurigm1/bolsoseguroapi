@@ -1,5 +1,6 @@
 package bolsoseguroapi.Service;
 
+import bolsoseguroapi.Dto.Transacao.BalancoMensalDetalhadoDTO;
 import bolsoseguroapi.Dto.Transacao.TransacaoDTO;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Despesa;
@@ -15,11 +16,16 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,8 +39,8 @@ public class TransacaoService {
 
     @Autowired
     private SecurityService securityService;
-@Autowired
-private ContaRepository contaRepository;
+    @Autowired
+    private ContaRepository contaRepository;
 
     public List<TransacaoDTO> obterUltimasTransacoesDeTodasContas() {
         // Obter o usuário logado
@@ -85,5 +91,60 @@ private ContaRepository contaRepository;
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+
+    public BigDecimal obterTotalDespesasMes() {
+        Usuario usuario = securityService.obterUsuarioLogado();
+        if (usuario == null) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+
+
+        List<Conta> contasDoUsuario = contaRepository.findByUsuario(usuario);
+        YearMonth mesAtual = YearMonth.now();
+        LocalDate startDate = mesAtual.atDay(1);
+        LocalDate today = LocalDate.now();
+
+        // Calcular despesas do usuário
+        return despesaRepository.calcularTotalDespesasMensalPorContas(contasDoUsuario, startDate, today);
+    }
+
+    public BigDecimal  obterTotalReceitasMes(){
+        Usuario usuario = securityService.obterUsuarioLogado();
+        if (usuario == null) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+
+
+        List<Conta> contasDoUsuario = contaRepository.findByUsuario(usuario);
+        YearMonth mesAtual = YearMonth.now();
+        LocalDate startDate = mesAtual.atDay(1);
+        LocalDate today = LocalDate.now();
+
+
+        return receitaRepository.calcularTotalReceitasMensalPorContas(contasDoUsuario, startDate, today);
+    }
+
+    public List<BalancoMensalDetalhadoDTO> obterBalancoUltimosMeses() {
+        int mesAtual = LocalDate.now().getMonthValue();
+        int mesesConsiderados = Math.min(mesAtual, 6);
+
+        List<BalancoMensalDetalhadoDTO> balancoMensal = new ArrayList<>();
+
+        for (int i = mesesConsiderados - 1; i >= 0; i--) {
+            YearMonth mes = YearMonth.now().minusMonths(i);
+            LocalDate dataInicial = mes.atDay(1);
+            LocalDate dataFinal = mes.atEndOfMonth();
+
+            BigDecimal totalReceitas = receitaRepository.calcularTotalReceitasMensal(dataInicial, dataFinal);
+            BigDecimal totalDespesas = despesaRepository.calcularTotalDespesasMensal(dataInicial, dataFinal);
+
+            String nomeMes = mes.getMonth().getDisplayName(TextStyle.FULL, new Locale("pt", "BR"));
+
+            balancoMensal.add(new BalancoMensalDetalhadoDTO(nomeMes, totalDespesas, totalReceitas));
+        }
+
+        return balancoMensal;
     }
 }

@@ -50,7 +50,7 @@ public class ReceitaService {
         receita.setConta(conta);
         receita.setCategoria(categoria);
         receita.setValor(receitaDTO.valor());
-        receita.setData(receitaDTO.date());
+        receita.setData(receitaDTO.data());
         receita.setDescricao(receitaDTO.descricao());
 
         // Atualiza o saldo da conta
