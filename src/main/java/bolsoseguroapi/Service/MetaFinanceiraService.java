@@ -6,6 +6,7 @@ import bolsoseguroapi.Model.MetaFinanceira;
 import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Repository.MetaFinanceiraRepository;
 import bolsoseguroapi.Security.SecurityService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,8 +15,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class MetaFinanceiraService {
-    private final MetaFinanceiraRepository metaRepository;
-    private final SecurityService securityService;
+    @Autowired
+    private  MetaFinanceiraRepository metaRepository;
+    @Autowired
+    private  SecurityService securityService;
 
     public MetaFinanceiraService(MetaFinanceiraRepository metaRepository, SecurityService securityService) {
         this.metaRepository = metaRepository;

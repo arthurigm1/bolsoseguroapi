@@ -1,6 +1,7 @@
 package bolsoseguroapi.Controller;
 
 import bolsoseguroapi.Dto.Conta.ContaCadastroDTO;
+import bolsoseguroapi.Dto.Conta.ContaGetDTO;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Service.ContaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,8 @@ public class ContaController {
 
 
     @GetMapping
-    public ResponseEntity<List<Conta>> listarContas() {
-        List<Conta> contas = contaService.listarContas();
+    public ResponseEntity<List<ContaGetDTO>> listarContas() {
+        List<ContaGetDTO> contas = contaService.listarContasPorUsuario();
         return new ResponseEntity<>(contas, HttpStatus.OK);
     }
 

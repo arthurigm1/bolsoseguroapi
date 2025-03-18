@@ -16,7 +16,7 @@ public class UsuarioController {
     UsuarioService usuarioService;
 
 
-    @GetMapping("/home")
+    @GetMapping("")
     public ResponseEntity<SaldoResponseDTO> obterSaldo() {
         SaldoResponseDTO saldo = usuarioService.obterSaldo();
         return ResponseEntity.ok(saldo);

@@ -1,6 +1,7 @@
 package bolsoseguroapi.Service;
 
 import bolsoseguroapi.Dto.Conta.ContaCadastroDTO;
+import bolsoseguroapi.Dto.Conta.ContaGetDTO;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Repository.ContaRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ContaService {
@@ -35,9 +37,15 @@ public class ContaService {
 
 
 
-    public List<Conta> listarContas() {
-        return contaRepository.findAll();
-    }
+
+        public List<ContaGetDTO> listarContasPorUsuario() {
+            Usuario usuario = securityService.obterUsuarioLogado();
+            List<Conta> contas = contaRepository.findByUsuario(usuario); // Substitua com sua lógica de consulta
+
+            return contas.stream()
+                    .map(conta -> new ContaGetDTO(conta.getId(), conta.getBanco()))
+                    .collect(Collectors.toList());
+        }
 
 
     public Optional<Conta> buscarContaPorId(UUID id) {
