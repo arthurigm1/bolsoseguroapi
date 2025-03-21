@@ -39,4 +39,8 @@ public class TransacaoController {
     public ResponseEntity<List<BalancoMensalDetalhadoDTO>> obterBalancoUltimosMeses() {
         return ResponseEntity.ok(transacaoService.obterBalancoUltimosMeses());
     }
+    @GetMapping("/investimento")
+    public BigDecimal obterSaldoPorCategoria() {
+        return transacaoService.calcularSaldoCategoria();
+    }
 }

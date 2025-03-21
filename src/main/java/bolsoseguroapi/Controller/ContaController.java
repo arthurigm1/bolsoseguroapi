@@ -2,6 +2,7 @@ package bolsoseguroapi.Controller;
 
 import bolsoseguroapi.Dto.Conta.ContaCadastroDTO;
 import bolsoseguroapi.Dto.Conta.ContaGetDTO;
+import bolsoseguroapi.Dto.Conta.ContaSaldoDTO;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Service.ContaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,11 @@ public class ContaController {
         return new ResponseEntity<>(contas, HttpStatus.OK);
     }
 
+    @GetMapping("/saldo")
+    public ResponseEntity<List<ContaSaldoDTO>> listarSaldoContas() {
+        List<ContaSaldoDTO> contas = contaService.listarSaldoContas();
+        return new ResponseEntity<>(contas, HttpStatus.OK);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Conta> buscarContaPorId(@PathVariable UUID id) {

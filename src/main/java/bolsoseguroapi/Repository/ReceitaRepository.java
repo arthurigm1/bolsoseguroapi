@@ -32,4 +32,5 @@ public interface ReceitaRepository extends JpaRepository<Receita, UUID> {
     @Query("SELECT COALESCE(SUM(r.valor), 0) FROM Receita r WHERE r.data BETWEEN :dataInicial AND :dataFinal")
     BigDecimal calcularTotalReceitasMensal(LocalDate dataInicial, LocalDate dataFinal);
 
+    List<Receita> findByContaUsuarioAndCategoriaId( Usuario usuario, Long categoriaId);
 }

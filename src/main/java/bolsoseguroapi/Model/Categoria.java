@@ -1,5 +1,6 @@
 package bolsoseguroapi.Model;
 
+import bolsoseguroapi.Model.Enum.TipoCategoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,12 +25,16 @@ public class Categoria {
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = true)
     private Usuario usuario;
+    @Enumerated(EnumType.STRING)
+
+    private TipoCategoria tipo;
 
     private boolean fixa;
 
-    public Categoria(String nome, boolean fixa) {
+    public Categoria(String nome, Boolean fixa, TipoCategoria tipo) {
         this.nome = nome;
         this.fixa = fixa;
+        this.tipo = tipo;
     }
 
 

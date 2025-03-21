@@ -2,6 +2,7 @@ package bolsoseguroapi.Service;
 
 import bolsoseguroapi.Dto.Conta.ContaCadastroDTO;
 import bolsoseguroapi.Dto.Conta.ContaGetDTO;
+import bolsoseguroapi.Dto.Conta.ContaSaldoDTO;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Repository.ContaRepository;
@@ -46,6 +47,17 @@ public class ContaService {
                     .map(conta -> new ContaGetDTO(conta.getId(), conta.getBanco()))
                     .collect(Collectors.toList());
         }
+
+
+    public List<ContaSaldoDTO> listarSaldoContas() {
+        Usuario usuario = securityService.obterUsuarioLogado();
+        List<Conta> contas = contaRepository.findByUsuario(usuario); // Substitua com sua lógica de consulta
+
+        return contas.stream()
+                .map(conta -> new ContaSaldoDTO(conta.getId(), conta.getBanco(),conta.getSaldo()))
+                .collect(Collectors.toList());
+    }
+
 
 
     public Optional<Conta> buscarContaPorId(UUID id) {

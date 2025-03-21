@@ -1,9 +1,9 @@
 package bolsoseguroapi.Service;
 
-
 import bolsoseguroapi.Dto.Categoria.CategoriaDTO;
 import bolsoseguroapi.Exceptions.CategoriaLimitException;
 import bolsoseguroapi.Model.Categoria;
+import bolsoseguroapi.Model.Enum.TipoCategoria;
 import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Repository.CategoriaRepository;
 import bolsoseguroapi.Repository.UsuarioRepository;
@@ -21,63 +21,70 @@ public class CategoriaService {
     private CategoriaRepository categoriaRepository;
 
     @Autowired
-    private UsuarioRepository usuarioRepository; // Para buscar usuários
-
-    @Autowired
     private SecurityService securityService;
 
-    private static final List<String> CATEGORIAS_FIXAS = List.of(
-            "Alimentação", "Transporte", "Saúde", "Educação", "Lazer"
+    private static final List<Categoria> CATEGORIAS_FIXAS = List.of(
+            new Categoria("Alimentação", true, TipoCategoria.DESPESA),
+            new Categoria("Transporte", true, TipoCategoria.DESPESA),
+            new Categoria("Saúde", true, TipoCategoria.DESPESA),
+            new Categoria("Educação", true, TipoCategoria.DESPESA),
+            new Categoria("Lazer", true, TipoCategoria.DESPESA),
+            new Categoria("Salário", true, TipoCategoria.RECEITA),
+            new Categoria("Investimentos", true, TipoCategoria.RECEITA),
+            new Categoria("Empréstimos", true, TipoCategoria.RECEITA)
     );
 
     @PostConstruct
     public void inicializarCategoriasFixas() {
+        // Obtém os nomes das categorias existentes para evitar buscas repetidas
+        List<String> nomesExistentes = categoriaRepository.findAll().stream()
+                .map(Categoria::getNome)
+                .toList();
 
-        List<String> categoriasExistentes = categoriaRepository.findAllByNomeIn(CATEGORIAS_FIXAS)
-                .stream().map(Categoria::getNome).collect(Collectors.toList());
-
-        // Filtra e adiciona somente as que ainda não existem
+        // Filtra apenas as categorias que ainda não existem e adiciona ao banco
         CATEGORIAS_FIXAS.stream()
-                .filter(nome -> !categoriasExistentes.contains(nome))
-                .forEach(nome -> categoriaRepository.save(new Categoria(nome, true)));
+                .filter(categoria -> !nomesExistentes.contains(categoria.getNome()))
+                .forEach(categoriaRepository::save);
     }
 
-    public Categoria criarCategoriaPersonalizada(String nomeCategoria) {
+    public Categoria criarCategoriaPersonalizada(String nomeCategoria, TipoCategoria tipo) {
         Usuario usuario = securityService.obterUsuarioLogado();
-        usuarioRepository.findById(usuario.getId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        // Verificar se o usuário já atingiu o limite de 5 categorias personalizadas
+        // Verifica se o usuário já atingiu o limite de 5 categorias personalizadas
         if (categoriaRepository.countByUsuario(usuario) >= 5) {
             throw new CategoriaLimitException("Você já atingiu o limite de 5 categorias personalizadas.");
         }
 
-        // Verificar se já existe uma categoria com o mesmo nome para esse usuário
-        if (categoriaRepository.existsByNomeAndUsuario(nomeCategoria, usuario)) {
-            throw new CategoriaLimitException("Categoria já existe para este usuário.");
+        // Verifica se já existe uma categoria com o mesmo nome e tipo para esse usuário
+        if (categoriaRepository.existsByNomeAndUsuarioAndTipo(nomeCategoria, usuario, tipo)) {
+            throw new CategoriaLimitException("Já existe uma categoria do tipo " + tipo + " com esse nome para este usuário.");
         }
 
-        Categoria categoria = new Categoria();
-        categoria.setNome(nomeCategoria);
-        categoria.setFixa(false);
+        // Cria a nova categoria personalizada
+        Categoria categoria = new Categoria(nomeCategoria, false, tipo);
         categoria.setUsuario(usuario);
 
         return categoriaRepository.save(categoria);
     }
 
     public List<CategoriaDTO> getCategoriasFixas() {
-        // Supondo que as categorias fixas são categorias que não pertencem a nenhum usuário específico
-        List<Categoria> categoriasFixas = categoriaRepository.findCategoriasFixas();
-        return categoriasFixas.stream()
-                .map(categoria -> new CategoriaDTO(categoria.getId(), categoria.getNome(), true))
+        return categoriaRepository.findCategoriasFixas().stream()
+                .map(categoria -> new CategoriaDTO(categoria.getId(), categoria.getNome(), true, categoria.getTipo()))
                 .collect(Collectors.toList());
     }
 
     public List<CategoriaDTO> getCategoriasPersonalizadasDoUsuario() {
         Usuario usuario = securityService.obterUsuarioLogado();
-        List<Categoria> categoriasPersonalizadas = categoriaRepository.findCategoriasPersonalizadasByUsuarioId(usuario.getId());
-        return categoriasPersonalizadas.stream()
-                .map(categoria -> new CategoriaDTO(categoria.getId(), categoria.getNome(), false))
+        return categoriaRepository.findCategoriasPersonalizadasByUsuarioId(usuario.getId()).stream()
+                .map(categoria -> new CategoriaDTO(categoria.getId(), categoria.getNome(), false, categoria.getTipo()))
+                .collect(Collectors.toList());
+    }
+
+    public List<CategoriaDTO> getCategoriasPorTipo(TipoCategoria tipo) {
+        Usuario usuario = securityService.obterUsuarioLogado();
+        return categoriaRepository.findByTipo(tipo).stream()
+                .filter(categoria -> (categoria.isFixa() || categoria.getUsuario().equals(usuario))) // Filtra por categorias fixas ou do usuário
+                .map(categoria -> new CategoriaDTO(categoria.getId(), categoria.getNome(), categoria.isFixa(), categoria.getTipo()))
                 .collect(Collectors.toList());
     }
 }

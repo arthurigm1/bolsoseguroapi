@@ -147,4 +147,20 @@ public class TransacaoService {
 
         return balancoMensal;
     }
+
+    public BigDecimal calcularSaldoCategoria() {
+        Usuario usuario = securityService.obterUsuarioLogado(); // Obter o usuário logado
+        if (usuario == null) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+
+        // Buscar as receitas do usuário logado pela conta e categoria (usando o ID da categoria)
+        List<Receita> receitas = receitaRepository.findByContaUsuarioAndCategoriaId(usuario, 13L);
+
+        // Somar os valores das receitas com BigDecimal para evitar problemas de precisão
+        return receitas.stream()
+                .map(Receita::getValor)  // Extrai o valor de cada receita
+                .filter(valor -> valor != null)  // Filtra valores nulos, caso haja
+                .reduce(BigDecimal.ZERO, BigDecimal::add);  // Soma os valores
+    }
 }
