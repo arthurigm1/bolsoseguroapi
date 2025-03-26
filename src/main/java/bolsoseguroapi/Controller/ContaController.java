@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,7 +57,7 @@ public class ContaController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarConta(@PathVariable UUID id) {
+    public ResponseEntity<Void> deletarConta(@PathVariable UUID id) throws AccessDeniedException {
         contaService.deletarConta(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

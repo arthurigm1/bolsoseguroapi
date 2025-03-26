@@ -2,9 +2,14 @@ package bolsoseguroapi.Controller;
 
 import bolsoseguroapi.Dto.Transacao.BalancoMensalDetalhadoDTO;
 import bolsoseguroapi.Dto.Transacao.TransacaoDTO;
+import bolsoseguroapi.Dto.Transacao.TransacaoDetalhadaDTO;
 import bolsoseguroapi.Service.TransacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,4 +48,27 @@ public class TransacaoController {
     public BigDecimal obterSaldoPorCategoria() {
         return transacaoService.calcularSaldoCategoria();
     }
+
+    @GetMapping("/saldosMes")
+    public ResponseEntity<List<TransacaoDetalhadaDTO>> obterTransacoesPorMes(
+            @RequestParam int mes,
+            @RequestParam int ano) {
+
+        List<TransacaoDetalhadaDTO> transacoes = transacaoService.obterTransacoesPorMes(mes, ano);
+        return ResponseEntity.ok(transacoes);
+    }
+    @GetMapping("/relatorio")
+    public ResponseEntity<byte[]> gerarRelatorioTransacaoMensal(  @RequestParam int mes,
+                                                                  @RequestParam int ano) {
+        try {
+            byte[] pdfBytes = transacaoService.gerarRelatorioTransacaoMensal(mes,ano);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=relatorio_mes.pdf")
+                    .body(pdfBytes);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

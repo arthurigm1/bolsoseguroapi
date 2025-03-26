@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.awt.print.Pageable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,4 +34,7 @@ public interface ReceitaRepository extends JpaRepository<Receita, UUID> {
     BigDecimal calcularTotalReceitasMensal(LocalDate dataInicial, LocalDate dataFinal);
 
     List<Receita> findByContaUsuarioAndCategoriaId( Usuario usuario, Long categoriaId);
+    @Query("SELECT r FROM Receita r WHERE r.conta IN :contas AND r.data BETWEEN :inicio AND :fim ORDER BY r.data DESC")
+    List<Receita> findReceitasByContasAndDataBetween(@Param("contas") List<Conta> contas, @Param("inicio") LocalDate inicio, @Param("fim") LocalDate fim);
+
 }

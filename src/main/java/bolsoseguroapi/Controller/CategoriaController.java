@@ -4,12 +4,15 @@ import bolsoseguroapi.Dto.Categoria.CategoriaDTO;
 import bolsoseguroapi.Model.Enum.TipoCategoria;
 import bolsoseguroapi.Service.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/categorias")
@@ -20,7 +23,7 @@ public class CategoriaController {
     @PostMapping("")
     public ResponseEntity<String> criarCategoriaPersonalizada(@RequestBody CategoriaDTO categoriaDTO) {
         categoriaService.criarCategoriaPersonalizada(categoriaDTO.getNome(), categoriaDTO.getTipo());
-        return ResponseEntity.ok("Categoria personalizada criada com sucesso.");
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("")
@@ -41,6 +44,12 @@ public class CategoriaController {
     @GetMapping("/receitas")
     public ResponseEntity<List<CategoriaDTO>> getCategoriasReceitas() {
         return ResponseEntity.ok(categoriaService.getCategoriasPorTipo(TipoCategoria.RECEITA));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarConta(@PathVariable Long id) throws AccessDeniedException {
+        categoriaService.deletarConta(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

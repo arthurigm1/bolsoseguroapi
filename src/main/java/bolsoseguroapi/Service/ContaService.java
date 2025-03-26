@@ -8,9 +8,11 @@ import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Repository.ContaRepository;
 import bolsoseguroapi.Security.SecurityService;
 import bolsoseguroapi.Validador.ContaValidador;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,7 +79,18 @@ public class ContaService {
     }
 
 
-    public void deletarConta(UUID id) {
+    public void deletarConta(UUID id) throws AccessDeniedException {
+        Usuario usuario = securityService.obterUsuarioLogado();
+
+        Conta conta = contaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Conta não encontrada com o ID: " + id));
+
+        // Verifica se a conta pertence ao usuário logado
+        if (!conta.getUsuario().getId().equals(usuario.getId())) {
+            throw new AccessDeniedException("Você não tem permissão para deletar esta conta");
+        }
+
+
         contaRepository.deleteById(id);
     }
 }

@@ -31,7 +31,7 @@ public class Despesa {
     @JoinColumn(name = "conta_id", nullable = false)
     private Conta conta;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 

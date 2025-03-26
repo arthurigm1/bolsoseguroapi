@@ -3,16 +3,20 @@ package bolsoseguroapi.Service;
 import bolsoseguroapi.Dto.Categoria.CategoriaDTO;
 import bolsoseguroapi.Exceptions.CategoriaLimitException;
 import bolsoseguroapi.Model.Categoria;
+import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Enum.TipoCategoria;
 import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Repository.CategoriaRepository;
 import bolsoseguroapi.Repository.UsuarioRepository;
 import bolsoseguroapi.Security.SecurityService;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,5 +90,20 @@ public class CategoriaService {
                 .filter(categoria -> (categoria.isFixa() || categoria.getUsuario().equals(usuario))) // Filtra por categorias fixas ou do usuário
                 .map(categoria -> new CategoriaDTO(categoria.getId(), categoria.getNome(), categoria.isFixa(), categoria.getTipo()))
                 .collect(Collectors.toList());
+    }
+
+    public void deletarConta(Long id) throws AccessDeniedException {
+        Usuario usuario = securityService.obterUsuarioLogado();
+
+        Categoria categoria = categoriaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Conta não encontrada com o ID: " + id));
+
+        // Verifica se a conta pertence ao usuário logado
+        if (!categoria.getUsuario().getId().equals(usuario.getId())) {
+            throw new AccessDeniedException("Você não tem permissão para deletar esta Categoria");
+        }
+
+
+        categoriaRepository.deleteById(id);
     }
 }

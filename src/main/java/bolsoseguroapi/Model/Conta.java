@@ -33,12 +33,12 @@ public class Conta {
     @Column(nullable = false)
     private BigDecimal saldo = BigDecimal.ZERO;
 
-    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Despesa> despesas;
 
-    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Receita> receitas;
 
-    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transferencia> transferencias;
 }
