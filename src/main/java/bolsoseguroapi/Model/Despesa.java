@@ -28,8 +28,12 @@ public class Despesa {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "conta_id", nullable = false)
+    @JoinColumn(name = "conta_id")
     private Conta conta;
+
+    @ManyToOne
+    @JoinColumn(name = "cartao_id")  // Associa a despesa a um cartão
+    private Cartao cartao;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "categoria_id", nullable = false)
@@ -51,4 +55,6 @@ public class Despesa {
     @LastModifiedDate //ATUALIZA A DATA AUTOMATICO QUANDO HOUVER ALTERACAO!
     @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
+
+
 }

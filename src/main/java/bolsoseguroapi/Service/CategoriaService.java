@@ -35,7 +35,8 @@ public class CategoriaService {
             new Categoria("Lazer", true, TipoCategoria.DESPESA),
             new Categoria("Salário", true, TipoCategoria.RECEITA),
             new Categoria("Investimentos", true, TipoCategoria.RECEITA),
-            new Categoria("Empréstimos", true, TipoCategoria.RECEITA)
+            new Categoria("Empréstimos", true, TipoCategoria.RECEITA),
+            new Categoria("Pagamento Cartão",true,TipoCategoria.DESPESA)
     );
 
     @PostConstruct
@@ -92,17 +93,16 @@ public class CategoriaService {
                 .collect(Collectors.toList());
     }
 
-    public void deletarConta(Long id) throws AccessDeniedException {
+    public void deletarCategoria(Long id) throws AccessDeniedException {
         Usuario usuario = securityService.obterUsuarioLogado();
 
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Conta não encontrada com o ID: " + id));
 
-        // Verifica se a conta pertence ao usuário logado
+
         if (!categoria.getUsuario().getId().equals(usuario.getId())) {
             throw new AccessDeniedException("Você não tem permissão para deletar esta Categoria");
         }
-
 
         categoriaRepository.deleteById(id);
     }

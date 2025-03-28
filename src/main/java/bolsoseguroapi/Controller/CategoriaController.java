@@ -47,8 +47,8 @@ public class CategoriaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarConta(@PathVariable Long id) throws AccessDeniedException {
-        categoriaService.deletarConta(id);
+    public ResponseEntity<Void> deletarCategoria(@PathVariable Long id) throws AccessDeniedException {
+        categoriaService.deletarCategoria(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

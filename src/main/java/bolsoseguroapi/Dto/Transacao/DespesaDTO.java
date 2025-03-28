@@ -1,5 +1,7 @@
 package bolsoseguroapi.Dto.Transacao;
 
+import bolsoseguroapi.Model.Enum.TipoPagamento;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,5 +12,7 @@ public record DespesaDTO(
         LocalDate data,
         String categoria,
         String descricao,
-        UUID contaId
+        UUID contaId,   // ID da conta bancária
+        UUID cartaoId,  // ID do cartão
+        TipoPagamento tipoPagamento
 ) {}

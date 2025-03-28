@@ -25,8 +25,8 @@ public class Categoria {
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = true)
     private Usuario usuario;
-    @Enumerated(EnumType.STRING)
 
+    @Enumerated(EnumType.STRING)
     private TipoCategoria tipo;
 
     private boolean fixa;

@@ -178,6 +178,7 @@ public class TransacaoService {
                 .filter(valor -> valor != null)  // Filtra valores nulos, caso haja
                 .reduce(BigDecimal.ZERO, BigDecimal::add);  // Soma os valores
     }
+
     public List<TransacaoDetalhadaDTO> obterTransacoesPorMes(int mes, int ano) {
         // Obter o usuário logado
         Usuario usuario = securityService.obterUsuarioLogado();
@@ -237,6 +238,11 @@ public class TransacaoService {
     }
 
     public byte[] gerarRelatorioTransacaoMensal(int mes, int ano) throws DocumentException, IOException {
+        Usuario usuario = securityService.obterUsuarioLogado();
+        if (usuario == null) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+
         // Obter as transações do mês informado
         List<TransacaoDetalhadaDTO> transacoes = obterTransacoesPorMes(mes, ano);
 
