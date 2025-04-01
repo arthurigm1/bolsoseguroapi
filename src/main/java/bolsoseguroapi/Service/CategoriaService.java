@@ -56,7 +56,7 @@ public class CategoriaService {
         Usuario usuario = securityService.obterUsuarioLogado();
 
         // Verifica se o usuário já atingiu o limite de 5 categorias personalizadas
-        if (categoriaRepository.countByUsuario(usuario) >= 5) {
+        if (categoriaRepository.countByUsuario(usuario) >= 20) {
             throw new CategoriaLimitException("Você já atingiu o limite de 5 categorias personalizadas.");
         }
 

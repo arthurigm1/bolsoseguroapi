@@ -2,6 +2,7 @@ package bolsoseguroapi.Controller;
 
 import bolsoseguroapi.Dto.MetaFinanceira.MetaFinanceiraRequestDTO;
 import bolsoseguroapi.Dto.MetaFinanceira.MetaFinanceiraResponseDTO;
+import bolsoseguroapi.Dto.MetaFinanceira.MetaFinanceiraUpdateDTO;
 import bolsoseguroapi.Service.MetaFinanceiraService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,15 +32,19 @@ public class MetaFinanceiraController {
         return ResponseEntity.ok(metaService.listarMetasUsuario());
     }
 
-    // Adicionar valor à meta
-    @PutMapping("/{metaId}/adicionar")
-    public ResponseEntity<MetaFinanceiraResponseDTO> adicionarValor(@PathVariable UUID metaId, @RequestParam BigDecimal valor) {
-        return ResponseEntity.ok(metaService.adicionarValor(metaId, valor));
+
+    @PutMapping("/{metaId}")
+    public ResponseEntity<MetaFinanceiraResponseDTO> editarMeta(
+            @PathVariable UUID metaId,
+            @RequestBody MetaFinanceiraUpdateDTO updateDTO) {
+        return ResponseEntity.ok(metaService.editarMeta(metaId, updateDTO));
     }
 
-    // Verificar se a meta foi atingida
-    @GetMapping("/{metaId}/verificar")
-    public ResponseEntity<Boolean> verificarMeta(@PathVariable UUID metaId) {
-        return ResponseEntity.ok(metaService.verificarMetaAtingida(metaId));
+    @DeleteMapping("/{metaId}")
+    public ResponseEntity<Void> deletarMeta(@PathVariable UUID metaId) {
+        metaService.deletarMeta(metaId);
+        return ResponseEntity.noContent().build();
     }
+
+
 }

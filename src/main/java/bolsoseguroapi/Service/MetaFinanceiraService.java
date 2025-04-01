@@ -2,6 +2,7 @@ package bolsoseguroapi.Service;
 
 import bolsoseguroapi.Dto.MetaFinanceira.MetaFinanceiraRequestDTO;
 import bolsoseguroapi.Dto.MetaFinanceira.MetaFinanceiraResponseDTO;
+import bolsoseguroapi.Dto.MetaFinanceira.MetaFinanceiraUpdateDTO;
 import bolsoseguroapi.Model.MetaFinanceira;
 import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Repository.MetaFinanceiraRepository;
@@ -33,7 +34,7 @@ public class MetaFinanceiraService {
         meta.setUsuario(usuario);
         meta.setNome(dto.nome());
         meta.setValorMeta(dto.valorMeta());
-        meta.setValorAtual(BigDecimal.ZERO); // Inicializa com R$ 0,00
+        meta.setValorAtual(dto.valorAtual());
 
         metaRepository.save(meta);
 
@@ -50,23 +51,22 @@ public class MetaFinanceiraService {
     }
 
     // Atualizar o valor poupado na meta
-    public MetaFinanceiraResponseDTO adicionarValor(UUID metaId, BigDecimal valorAdicionado) {
+    public MetaFinanceiraResponseDTO editarMeta(UUID metaId, MetaFinanceiraUpdateDTO dto) {
         MetaFinanceira meta = metaRepository.findById(metaId)
                 .orElseThrow(() -> new RuntimeException("Meta não encontrada!"));
 
-        meta.setValorAtual(meta.getValorAtual().add(valorAdicionado));
+        meta.setValorAtual(dto.valorAtual());
+        meta.setValorMeta(dto.valorMeta());
         metaRepository.save(meta);
 
         return converterParaDTO(meta);
     }
 
-    // Verificar se a meta foi atingida
-    public boolean verificarMetaAtingida(UUID metaId) {
+    public void deletarMeta(UUID metaId) {
         MetaFinanceira meta = metaRepository.findById(metaId)
                 .orElseThrow(() -> new RuntimeException("Meta não encontrada!"));
-        return meta.atingiuMeta();
+        metaRepository.delete(meta);
     }
-
 
     private MetaFinanceiraResponseDTO converterParaDTO(MetaFinanceira meta) {
         return new MetaFinanceiraResponseDTO(
