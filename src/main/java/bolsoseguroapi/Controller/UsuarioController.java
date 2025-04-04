@@ -1,6 +1,7 @@
 package bolsoseguroapi.Controller;
 
 import bolsoseguroapi.Dto.Usuario.SaldoResponseDTO;
+import bolsoseguroapi.Dto.Usuario.UsuarioInfoResponse;
 import bolsoseguroapi.Service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,4 +22,12 @@ public class UsuarioController {
         SaldoResponseDTO saldo = usuarioService.obterSaldo();
         return ResponseEntity.ok(saldo);
     }
+
+
+    @GetMapping("/info")
+    public ResponseEntity<UsuarioInfoResponse> getUsuario() {
+        UsuarioInfoResponse usuarioInfoResponse = usuarioService.getUsuario();
+        return ResponseEntity.ok(usuarioInfoResponse);
+    }
+
 }

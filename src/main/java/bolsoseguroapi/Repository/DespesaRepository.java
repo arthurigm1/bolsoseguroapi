@@ -33,5 +33,12 @@ public interface DespesaRepository extends JpaRepository<Despesa, UUID> {
 
     @Query("SELECT d FROM Despesa d WHERE d.conta IN :contas AND d.data BETWEEN :inicio AND :fim ORDER BY d.data DESC")
     List<Despesa> findDespesasByContasAndDataBetween(@Param("contas") List<Conta> contas, @Param("inicio") LocalDate inicio, @Param("fim") LocalDate fim);
+
+    @Query("SELECT d FROM Despesa d WHERE d.cartao.id = :cartaoId AND d.data BETWEEN :inicio AND :fim")
+    List<Despesa> findByCartaoAndDataBetween(
+            @Param("cartaoId") UUID cartaoId,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim
+    );
 }
 

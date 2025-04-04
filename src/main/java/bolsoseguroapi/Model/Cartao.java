@@ -38,9 +38,6 @@ public class Cartao {
     private BigDecimal faturaAtual = BigDecimal.ZERO;
 
 
-    @Column(nullable = true)
-    private LocalDate dataFatura;
-
     @Enumerated(EnumType.STRING)
     private BandeiraCartao bandeira;
 

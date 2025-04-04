@@ -6,9 +6,12 @@ import bolsoseguroapi.Dto.Usuario.*;
 import bolsoseguroapi.Exceptions.RegistroException;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Enum.UsuarioRole;
+import bolsoseguroapi.Model.PasswordResetToken;
+import bolsoseguroapi.Repository.PasswordTokenRepository;
 import bolsoseguroapi.Repository.UsuarioRepository;
 
 import bolsoseguroapi.Model.Usuario;
+import bolsoseguroapi.Security.SecurityService;
 import bolsoseguroapi.Utill.RandomString;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -18,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -27,9 +32,12 @@ public class AuthService {
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
-  //  private final PasswordResetService passwordResetService;
-   // private final PasswordResetTokenRepository passwordResetTokenRepository;
-
+    private final MailService  mailService;
+    private final UsuarioService usuarioService;
+    private final PasswordResetService passwordResetService;
+    private final PasswordTokenRepository passwordResetTokenRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final SecurityService securityService;
     public Object login(@Valid LoginRequestDto body) {
         Usuario user = this.repository.findByEmail(body.email());
         if (user == null) {
@@ -64,24 +72,24 @@ public class AuthService {
 
         Usuario savedUser = repository.save(newUser);
 
-       /* try {
+        try {
             mailService.sendVerificationEmail(savedUser);
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new RuntimeException("Erro ao enviar o e-mail de verificação", e);
-        }*/
+        }
         return new ResponseDto(savedUser.getNome(), null, savedUser.getId());
     }
 
 
 
-    /*// Verificação de código (para ativação de conta, por exemplo)
+
     public String verifyUser(String code) {
         return usuarioService.verify(code) ? "verify_success" : "verify_fail";
-    }*/
+    }
 
 
 
-   /* // Envio de e-mail de recuperação de senha
+
     public Map<String, String> forgotPassword(Map<String, String> request) throws MessagingException, UnsupportedEncodingException {
         String email = request.get("email");
         Usuario usuario = repository.findByEmail(email);
@@ -97,7 +105,7 @@ public class AuthService {
         return response;
     }
 
-    // Reset de senha
+
     public Map<String, String> resetPassword(Map<String, String> request) {
         String token = request.get("token");
         String newPassword = request.get("password");
@@ -113,5 +121,15 @@ public class AuthService {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Senha redefinida com sucesso!");
         return response;
-    }*/
+    }
+
+    public boolean alterarSenha( AlterarSenhadto alterarSenhaDTO) {
+        Usuario usuario = securityService.obterUsuarioLogado();
+        if (!passwordEncoder.matches(alterarSenhaDTO.senhaAtual(), usuario.getSenha())) {
+            return false;
+        }
+        usuario.setSenha(passwordEncoder.encode(alterarSenhaDTO.novaSenha()));
+        usuarioRepository.save(usuario);
+        return true;
+    }
 }

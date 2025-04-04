@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -31,6 +34,8 @@ public class DespesaService {
     private CategoriaRepository categoriaRepository;
     @Autowired
     private SecurityService securityService;
+    @Autowired
+    private FaturaRepository faturaRepository;
 
     public Despesa adicionarDespesa(DespesaDTO despesaDTO) {
         Usuario usuario = securityService.obterUsuarioLogado();
@@ -82,33 +87,72 @@ public class DespesaService {
                 .orElseThrow(() -> new RuntimeException("Cartão não encontrado"));
         despesa.setCartao(cartao);
 
-        // Verifica se a despesa entra na fatura atual ou na próxima
-        LocalDate hoje = LocalDate.now();
+        // Calcula a fatura correta
         LocalDate dataFatura = calcularDataFatura(cartao, dataDespesa);
-        boolean faturaAtual = dataFatura.getMonthValue() == hoje.getMonthValue() && dataFatura.getYear() == hoje.getYear();
+        FaturaCartao fatura = faturaRepository.findByCartaoAndDataVencimento(cartao, dataFatura)
+                .orElseGet(() -> {
+                    // Criar nova fatura se não existir
+                    FaturaCartao novaFatura = new FaturaCartao();
+                    novaFatura.setCartao(cartao);
+                    novaFatura.setDataVencimento(dataFatura);
+                    novaFatura.setValor(BigDecimal.ZERO);
+                    novaFatura.setPaga(false);
+                    return faturaRepository.save(novaFatura);
+                });
 
-        if (faturaAtual) {
+        despesa.setFatura(fatura);
+
+        // Atualiza o valor da fatura
+        fatura.setValor(fatura.getValor().add(despesa.getValor()));
+
+        // Se for a fatura atual, reduz o limite do cartão
+        if (dataFatura.getMonthValue() == LocalDate.now().getMonthValue() &&
+                dataFatura.getYear() == LocalDate.now().getYear()) {
             cartao.setLimiteDisponivel(cartao.getLimiteDisponivel().subtract(despesa.getValor()));
         }
 
-        // Atualiza o total da fatura do cartão
-        cartao.setFaturaAtual(cartao.getFaturaAtual().add(despesa.getValor()));
-
+        // Salva as alterações
+        faturaRepository.save(fatura);
         cartaoRepository.save(cartao);
     }
 
 
+
     private LocalDate calcularDataFatura(Cartao cartao, LocalDate dataDespesa) {
         int diaFechamento = cartao.getDiaFechamentoFatura();
+        YearMonth anoMes;
 
-        // Se a data da despesa for antes ou no dia do fechamento
         if (dataDespesa.getDayOfMonth() <= diaFechamento) {
-            // A fatura será do mês atual (fechará no dia de fechamento deste mês)
-            return LocalDate.of(dataDespesa.getYear(), dataDespesa.getMonth(), diaFechamento);
+            // A fatura será do mês atual
+            anoMes = YearMonth.of(dataDespesa.getYear(), dataDespesa.getMonth());
         } else {
-            // Se for após o dia de fechamento, vai para o mês seguinte
+            // A fatura será do próximo mês
             LocalDate proximoMes = dataDespesa.plusMonths(1);
-            return LocalDate.of(proximoMes.getYear(), proximoMes.getMonth(), diaFechamento);
+            anoMes = YearMonth.of(proximoMes.getYear(), proximoMes.getMonth());
         }
+
+        // Garante que o diaFechamento nunca ultrapasse o último dia do mês
+        int ultimoDiaDoMes = anoMes.lengthOfMonth();
+        int diaVencimentoAjustado = Math.min(diaFechamento, ultimoDiaDoMes);
+
+        return LocalDate.of(anoMes.getYear(), anoMes.getMonth(), diaVencimentoAjustado);
     }
+
+    public List<DespesaCartaoDTO> buscarDespesasPorCartaoEMes(UUID cartaoId, int ano, int mes) {
+        YearMonth anoMes = YearMonth.of(ano, mes);
+        LocalDate inicio = anoMes.atDay(1);
+        LocalDate fim = anoMes.atEndOfMonth();
+
+        return despesaRepository.findByCartaoAndDataBetween(cartaoId, inicio, fim)
+                .stream()
+                .map(despesa -> new DespesaCartaoDTO(
+                        despesa.getValor(),
+                        despesa.getData(),
+                        despesa.getCategoria().getNome(),
+                        despesa.getDescricao()
+
+                ))
+                .collect(Collectors.toList());
+    }
+
 }

@@ -2,6 +2,7 @@ package bolsoseguroapi.Service;
 
 import bolsoseguroapi.Config.AuthenticatedUserProvider;
 import bolsoseguroapi.Dto.Usuario.SaldoResponseDTO;
+import bolsoseguroapi.Dto.Usuario.UsuarioInfoResponse;
 import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Repository.UsuarioRepository;
 import bolsoseguroapi.Security.SecurityService;
@@ -26,6 +27,26 @@ public class UsuarioService {
         String email = authenticatedUserProvider.getAuthenticatedUsername();
         Usuario usuario = userRepository.findByEmail(email);
         return new SaldoResponseDTO(usuario.getNome(), usuario.getSaldoGeral());
+    }
+
+    public UsuarioInfoResponse getUsuario()
+    {   String email = authenticatedUserProvider.getAuthenticatedUsername();
+        Usuario usuario = userRepository.findByEmail(email);
+        return new UsuarioInfoResponse(usuario.getNome(),usuario.getEmail(),usuario.isEnabled(),usuario.getSaldoGeral());
+
+    }
+
+    public boolean verify(String verificationCode){
+
+        Usuario user = userRepository.findByVerificationCode(verificationCode);
+
+        if(user == null || user.isEnabled()){
+            return false;
+        }
+        user.setVerificationCode(null);
+        user.setEnabled(true);
+        userRepository.save(user);
+        return true;
     }
 
 }

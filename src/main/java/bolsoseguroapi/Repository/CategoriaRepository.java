@@ -26,7 +26,7 @@ public interface CategoriaRepository extends JpaRepository<Categoria, Long  > {
     List<Categoria> findByTipo(TipoCategoria tipo);
 
     List<Categoria> findCategoriasPersonalizadasByUsuarioId(UUID usuarioId);
-
+    Optional<Categoria> findByNome(String nome);
 
     boolean existsByNomeAndUsuarioAndTipo(String nomeCategoria, Usuario usuario, TipoCategoria tipo);
 }

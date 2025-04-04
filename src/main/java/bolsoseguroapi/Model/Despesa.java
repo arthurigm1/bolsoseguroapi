@@ -56,5 +56,9 @@ public class Despesa {
     @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
 
+    @ManyToOne
+    @JoinColumn(name = "fatura_id")
+    private FaturaCartao fatura;
+
 
 }
