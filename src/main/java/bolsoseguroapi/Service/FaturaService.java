@@ -330,7 +330,7 @@ public class FaturaService {
 
         BigDecimal totalPago = faturas.stream()
                 .filter(FaturaCartaoDTO::paga)
-                .map(FaturaCartaoDTO::valor)
+                .map(FaturaCartaoDTO::totalpago)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Paragraph faturasTotal = new Paragraph("Total de Faturas: " + formatCurrency(totalFaturas), totalFont);
@@ -365,6 +365,9 @@ public class FaturaService {
     }
 
 
-    private String formatCurrency(BigDecimal value) {
-        return NumberFormat.getCurrencyInstance(new Locale("pt", "BR")).format(value);
-    }}
+    private String formatCurrency(BigDecimal valor) {
+        if (valor == null) valor = BigDecimal.ZERO;
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        return formatter.format(valor);
+    }
+}
