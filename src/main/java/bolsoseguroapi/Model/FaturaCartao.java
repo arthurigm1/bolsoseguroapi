@@ -35,4 +35,13 @@ public class FaturaCartao {
     private boolean paga;
 
     private LocalDate dataPagamento;
+
+    @Column
+    private boolean reaberta = false;
+
+    @Column
+    private LocalDate dataReabertura;
+
+    @Column
+    private BigDecimal totalpago;
 }

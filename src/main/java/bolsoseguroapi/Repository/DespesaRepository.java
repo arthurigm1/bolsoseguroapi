@@ -4,6 +4,7 @@ import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Despesa;
 import bolsoseguroapi.Model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -40,5 +41,6 @@ public interface DespesaRepository extends JpaRepository<Despesa, UUID> {
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim
     );
+
 }
 

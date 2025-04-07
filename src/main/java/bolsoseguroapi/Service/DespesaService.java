@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -89,20 +90,29 @@ public class DespesaService {
 
         // Calcula a fatura correta
         LocalDate dataFatura = calcularDataFatura(cartao, dataDespesa);
-        FaturaCartao fatura = faturaRepository.findByCartaoAndDataVencimento(cartao, dataFatura)
-                .orElseGet(() -> {
-                    // Criar nova fatura se não existir
-                    FaturaCartao novaFatura = new FaturaCartao();
-                    novaFatura.setCartao(cartao);
-                    novaFatura.setDataVencimento(dataFatura);
-                    novaFatura.setValor(BigDecimal.ZERO);
-                    novaFatura.setPaga(false);
-                    return faturaRepository.save(novaFatura);
-                });
+
+        Optional<FaturaCartao> faturaExistente = faturaRepository.findByCartaoAndDataVencimento(cartao, dataFatura);
+
+        FaturaCartao fatura;
+
+        if (faturaExistente.isPresent()) {
+            fatura = faturaExistente.get();
+            if (fatura.isPaga()) {
+                fatura.setPaga(false);
+                fatura.setDataPagamento(null);
+                fatura.setReaberta(true);
+                fatura.setDataReabertura(LocalDate.now());
+            }
+        } else {
+
+            fatura = new FaturaCartao();
+            fatura.setCartao(cartao);
+            fatura.setDataVencimento(dataFatura);
+            fatura.setValor(BigDecimal.ZERO);
+            fatura.setPaga(false);
+        }
 
         despesa.setFatura(fatura);
-
-        // Atualiza o valor da fatura
         fatura.setValor(fatura.getValor().add(despesa.getValor()));
 
         // Se for a fatura atual, reduz o limite do cartão

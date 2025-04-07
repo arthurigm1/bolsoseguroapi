@@ -16,12 +16,12 @@ public class MailService {
     @Autowired
     private JavaMailSender emailSender;
 
-    private String verifyURL = "https://pagiinova.netlify.app/verify?code=";
+    private String verifyURL = "http://localhost:4200/verify?code=";
 
     public void sendVerificationEmail(Usuario user) throws MessagingException, UnsupportedEncodingException {
         String toAddres = user.getEmail();
-        String fromAddres = "pagiionova@gmail.com";
-        String senderName = "`Pagiinova`";
+        String fromAddres = "bolsoseguro@gmail.com";
+        String senderName = "`BolsoSeguro`";
         String subject = "Por favor confirme seu cadastro!";
 
         String content = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional //EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +

@@ -132,4 +132,17 @@ public class AuthService {
         usuarioRepository.save(usuario);
         return true;
     }
+
+    public boolean verify(String verificationCode){
+
+        Usuario user = usuarioRepository.findByVerificationCode(verificationCode);
+
+        if(user == null || user.isEnabled()){
+            return false;
+        }
+        user.setVerificationCode(null);
+        user.setEnabled(true);
+        usuarioRepository.save(user);
+        return true;
+    }
 }

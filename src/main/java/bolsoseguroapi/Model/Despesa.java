@@ -32,7 +32,7 @@ public class Despesa {
     private Conta conta;
 
     @ManyToOne
-    @JoinColumn(name = "cartao_id")  // Associa a despesa a um cartão
+    @JoinColumn(name = "cartao_id")
     private Cartao cartao;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

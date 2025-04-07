@@ -16,7 +16,10 @@ public record FaturaCartaoDTO(
         BigDecimal limiteDisponivel,
         LocalDate dataVencimento,
         BigDecimal valor,
-        boolean paga
+        boolean paga,
+        boolean reaberta,
+        LocalDate dataReabertura,
+        BigDecimal totalpago
 ) {
     public static FaturaCartaoDTO fromEntity(FaturaCartao fatura) {
         Cartao cartao = fatura.getCartao();
@@ -29,7 +32,10 @@ public record FaturaCartaoDTO(
                 cartao.getLimiteDisponivel(),
                 fatura.getDataVencimento(),
                 fatura.getValor(),
-                fatura.isPaga()
+                fatura.isPaga(),
+                fatura.isReaberta(),
+                fatura.getDataReabertura(),
+                fatura.getTotalpago()
         );
     }
 }

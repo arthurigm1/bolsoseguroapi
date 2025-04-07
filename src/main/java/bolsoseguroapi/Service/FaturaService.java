@@ -2,6 +2,7 @@ package bolsoseguroapi.Service;
 
 import bolsoseguroapi.Controller.DespesaController;
 import bolsoseguroapi.Dto.Cartao.FaturaCartaoDTO;
+import bolsoseguroapi.Dto.Transacao.DespesaCartaoDTO;
 import bolsoseguroapi.Model.*;
 import bolsoseguroapi.Repository.*;
 import bolsoseguroapi.Security.SecurityService;
@@ -41,6 +42,8 @@ public class FaturaService {
     private final CategoriaRepository categoriaRepository;
     private final SecurityService securityService;
 
+    private final DespesaService despesaService;
+
     public List<FaturaCartaoDTO> buscarFaturasPorMes(UUID cartaoId, int mes, int ano) {
         Usuario usuario = securityService.obterUsuarioLogado();
         Cartao cartao = cartaoRepository.findById(cartaoId)
@@ -79,11 +82,6 @@ public class FaturaService {
         Conta conta = contaRepository.findById(contaId)
                 .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
 
-        // Verifica se a conta pertence ao mesmo usuário do cartão
-        if (!conta.getUsuario().getId().equals(usuario.getId())) {
-            throw new RuntimeException("A conta não pertence ao usuário logado");
-        }
-
         YearMonth periodo = YearMonth.of(ano, mes);
         LocalDate primeiroDia = periodo.atDay(1);
         LocalDate ultimoDia = periodo.atEndOfMonth();
@@ -100,17 +98,15 @@ public class FaturaService {
                 .map(FaturaCartao::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Verifica saldo suficiente na conta
-        if (conta.getSaldo().compareTo(totalFatura) < 0) {
-            throw new RuntimeException("Saldo insuficiente na conta para pagar a fatura");
-        }
 
         for (FaturaCartao fatura : faturas) {
             if (fatura.isPaga()) {
                 throw new RuntimeException("Fatura já foi paga.");
             }
+            BigDecimal totalPagoAtual = fatura.getTotalpago() != null ? fatura.getTotalpago() : BigDecimal.ZERO;
+            fatura.setTotalpago(totalPagoAtual.add(totalFatura));
+            fatura.setValor(BigDecimal.ZERO);
 
-            // Marca a fatura como paga
             fatura.setPaga(true);
             fatura.setDataPagamento(LocalDate.now());
             faturaRepository.save(fatura);
@@ -215,6 +211,60 @@ public class FaturaService {
         period.setAlignment(Element.ALIGN_CENTER);
         period.setSpacingAfter(20f);
         document.add(period);
+        // Buscar despesas do cartão no mês
+        List<DespesaCartaoDTO> despesascartao = despesaService.buscarDespesasPorCartaoEMes(cartaoId, ano, mes);
+
+// Se houver despesas, adicioná-las ao relatório
+        if (!despesascartao.isEmpty()) {
+            // Título da seção
+            Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY);
+            Paragraph despesasTitle = new Paragraph("Despesas do Cartão no Mês", sectionFont);
+            despesasTitle.setSpacingBefore(20f);
+            despesasTitle.setSpacingAfter(10f);
+            document.add(despesasTitle);
+
+            // Criar tabela de despesas
+            PdfPTable despesasTable = new PdfPTable(4); // Data, Descrição, Valor, Categoria
+            despesasTable.setWidthPercentage(100);
+            despesasTable.setSpacingBefore(10f);
+
+            // Cabeçalhos
+            String[] despesaHeaders = {"Data", "Descrição", "Valor (R$)", "Categoria"};
+            Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
+            for (String header : despesaHeaders) {
+                PdfPCell headerCell = new PdfPCell(new Phrase(header, headerFont));
+                headerCell.setBackgroundColor(new BaseColor(100, 149, 237)); // Azul cobalto
+                headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                headerCell.setPadding(5f);
+                despesasTable.addCell(headerCell);
+            }
+
+            // Preencher a tabela
+            Font cellFont = FontFactory.getFont(FontFactory.HELVETICA, 9);
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            for (DespesaCartaoDTO despesa : despesascartao) {
+                // Data
+                despesasTable.addCell(new PdfPCell(new Phrase(despesa.data().format(dateFormatter), cellFont)));
+
+                // Descrição
+                despesasTable.addCell(new PdfPCell(new Phrase(despesa.descricao(), cellFont)));
+
+                // Valor
+                PdfPCell valorCell = new PdfPCell(new Phrase(formatCurrency(despesa.valor()), cellFont));
+                valorCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                despesasTable.addCell(valorCell);
+
+                // Categoria
+                despesasTable.addCell(new PdfPCell(new Phrase(despesa.categoria(), cellFont)));
+            }
+
+            document.add(despesasTable);
+        } else {
+            Paragraph noDespesas = new Paragraph("Nenhuma despesa registrada para este cartão no período selecionado.",
+                    FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 10, BaseColor.GRAY));
+            noDespesas.setSpacingBefore(10f);
+            document.add(noDespesas);
+        }
 
         // Criar tabela para as faturas
         PdfPTable table = new PdfPTable(4); // Reduzido para 4 colunas conforme os dados disponíveis
@@ -242,7 +292,7 @@ public class FaturaService {
             table.addCell(new PdfPCell(new Phrase(fatura.dataVencimento().format(dateFormatter), cellFont)));
 
             // Valor
-            PdfPCell valorCell = new PdfPCell(new Phrase(formatCurrency(fatura.valor()), cellFont));
+            PdfPCell valorCell = new PdfPCell(new Phrase(formatCurrency(fatura.totalpago()), cellFont));
             valorCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
             table.addCell(valorCell);
 

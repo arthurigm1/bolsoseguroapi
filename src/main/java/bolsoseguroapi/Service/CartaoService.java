@@ -2,14 +2,12 @@ package bolsoseguroapi.Service;
 
 import bolsoseguroapi.Dto.Cartao.CartaoDTO;
 import bolsoseguroapi.Dto.Cartao.CartaoResponseDTO;
+import bolsoseguroapi.Dto.Cartao.CartaoUpdateDTO;
 import bolsoseguroapi.Dto.Cartao.PagamentoFaturaDTO;
 import bolsoseguroapi.Model.Cartao;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Usuario;
-import bolsoseguroapi.Repository.CartaoRepository;
-import bolsoseguroapi.Repository.CategoriaRepository;
-import bolsoseguroapi.Repository.ContaRepository;
-import bolsoseguroapi.Repository.UsuarioRepository;
+import bolsoseguroapi.Repository.*;
 import bolsoseguroapi.Security.SecurityService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +27,8 @@ public class CartaoService {
     private final CategoriaRepository categoriaRepository;
     private final SecurityService securityService;
     private final UsuarioRepository usuarioRepository;
+
+
 
     public Cartao criarCartao(CartaoDTO cartaoDTO) {
         Usuario usuario = securityService.obterUsuarioLogado();
@@ -64,6 +65,34 @@ public class CartaoService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteCartao(UUID id) {
+        Cartao cartao = cartaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cartão não encontrado"));
+        cartao.getDespesas().clear();
+        cartao.getFaturas().clear();
+
+        cartaoRepository.delete(cartao);
+    }
+
+    public void updateCartao(UUID id, CartaoUpdateDTO cartaoUpdateDTO) {
+        Cartao cartao = cartaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cartão não encontrado"));
+
+        if (cartaoUpdateDTO.nomeCartao() != null) {
+            cartao.setNome(cartaoUpdateDTO.nomeCartao());
+        }
+        if (cartaoUpdateDTO.limiteTotal() != null) {
+            cartao.setLimiteTotal(cartaoUpdateDTO.limiteTotal());
+        }
+        if (cartaoUpdateDTO.limiteDisponivel() != null) {
+            cartao.setLimiteDisponivel(cartaoUpdateDTO.limiteDisponivel());
+        }
+
+        cartaoRepository.save(cartao);
+    }
+
 
 
 }

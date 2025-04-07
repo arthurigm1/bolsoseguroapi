@@ -24,6 +24,11 @@ public class AuthController {
     private final PasswordService passwordService;
     private final AuthService authService;
 
+    @GetMapping("/verify")
+    public String verifyUser(@RequestParam("code") String code) {
+        return authService.verify(code) ? "verify_success" : "verify_fail";
+    }
+
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Valid LoginRequestDto body) {
         Object response = authService.login(body);

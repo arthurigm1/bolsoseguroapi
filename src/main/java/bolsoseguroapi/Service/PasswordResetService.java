@@ -30,7 +30,7 @@ public class PasswordResetService {
     @Autowired
     private JavaMailSender mailSender;
 
-    private String verifyURL = "https://pagiinova.netlify.app/reset-password?token=";
+    private String verifyURL = "http://localhost:4200/reset-password?token=";
     public void enviarEmailRecuperacao(String email) throws MessagingException, UnsupportedEncodingException {
         Usuario usuario = usuarioRepository.findByEmail(email);
         String token = UUID.randomUUID().toString();
@@ -43,8 +43,8 @@ public class PasswordResetService {
 
         String resetLink = "http://localhost:4200/reset-password?token=" + token;
         String toAddres = email;
-        String fromAddres = "pagiionova@gmail.com";
-        String senderName = "`Pagiinova`";
+        String fromAddres = "bolsoseguro@gmail.com";
+        String senderName = "Bolsoseguro";
 
         String subject = "Cadastre uma nova senha!";
 
