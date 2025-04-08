@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
 @Service
-@AllArgsConstructor
-
 @RequiredArgsConstructor
 public class ReceitaService {
 
@@ -29,7 +27,6 @@ public class ReceitaService {
     private final  ContaRepository contaRepository;
 
     private final  UsuarioRepository usuarioRepository;
-
 
     private final CategoriaRepository categoriaRepository;
 
