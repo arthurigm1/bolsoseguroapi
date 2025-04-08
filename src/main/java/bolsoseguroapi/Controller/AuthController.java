@@ -51,20 +51,19 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Map<String, String>> resetPassword(@RequestBody Map<String, String> request) {
-        String token = request.get("token");
-        String newPassword = request.get("password");
-        String message = passwordService.resetPassword(token, newPassword);
+    public ResponseEntity<Map<String, String>> resetPassword(@RequestBody @Valid ResetPasswordRequestDTO request) {
+        String message = passwordService.resetPassword(request.token(), request.password());
+
         Map<String, String> response = new HashMap<>();
         response.put("message", message);
+
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDTO request) {
         try {
-            String email = request.get("email");
-            String message = passwordService.forgotPassword(email);
+            String message = passwordService.forgotPassword(request.email());
 
             Map<String, String> response = new HashMap<>();
             response.put("message", message);
@@ -76,6 +75,8 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+
 
     @PutMapping("/changepass")
     public ResponseEntity<String> alterarSenha(@RequestBody AlterarSenhadto alterarSenhaDTO) {

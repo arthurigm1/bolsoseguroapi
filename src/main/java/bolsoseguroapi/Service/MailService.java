@@ -21,7 +21,7 @@ public class MailService {
     public void sendVerificationEmail(Usuario user) throws MessagingException, UnsupportedEncodingException {
         String toAddres = user.getEmail();
         String fromAddres = "bolsoseguro@gmail.com";
-        String senderName = "`BolsoSeguro`";
+        String senderName = "BolsoSeguro";
         String subject = "Por favor confirme seu cadastro!";
 
         String content = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional //EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +

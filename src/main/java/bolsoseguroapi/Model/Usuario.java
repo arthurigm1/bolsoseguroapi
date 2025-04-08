@@ -103,4 +103,6 @@ public class Usuario implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return UserDetails.super.isCredentialsNonExpired();
     }
+
+
 }

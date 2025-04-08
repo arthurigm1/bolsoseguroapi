@@ -8,6 +8,7 @@ import bolsoseguroapi.Dto.Transacao.ReceitaDTO;
 import bolsoseguroapi.Model.Enum.TipoPagamento;
 import bolsoseguroapi.Service.DespesaService;
 import bolsoseguroapi.Service.ReceitaService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +18,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/despesa")
+@RequiredArgsConstructor
 public class DespesaController {
-
-    @Autowired
-    private DespesaService despesaService;
+    private final DespesaService despesaService;
 
 
 
@@ -37,12 +37,14 @@ public class DespesaController {
         despesaService.adicionarDespesa(despesaDTO);
         return ResponseEntity.ok().build();
     }
-    @GetMapping("/cartao/{cartaoId}/{ano}/{mes}")
-    public List<DespesaCartaoDTO> getDespesasPorCartaoEMes(
-            @PathVariable UUID cartaoId,
-            @PathVariable int ano,
-            @PathVariable int mes
+    @GetMapping
+    public ResponseEntity<List<DespesaCartaoDTO>> getDespesas(
+            @RequestParam UUID cartaoId,
+            @RequestParam int ano,
+            @RequestParam int mes
     ) {
-        return despesaService.buscarDespesasPorCartaoEMes(cartaoId, ano, mes);
+        List<DespesaCartaoDTO> despesas = despesaService.buscarDespesasPorCartaoEMes(cartaoId, ano, mes);
+        return ResponseEntity.ok(despesas);
     }
+
 }

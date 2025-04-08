@@ -4,6 +4,7 @@ import bolsoseguroapi.Dto.Cartao.CartaoDTO;
 import bolsoseguroapi.Dto.Cartao.CartaoResponseDTO;
 import bolsoseguroapi.Dto.Cartao.CartaoUpdateDTO;
 import bolsoseguroapi.Dto.Cartao.PagamentoFaturaDTO;
+import bolsoseguroapi.Mapper.CartaoMapper;
 import bolsoseguroapi.Model.Cartao;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Usuario;
@@ -30,26 +31,20 @@ public class CartaoService {
 
 
 
-    public Cartao criarCartao(CartaoDTO cartaoDTO) {
+    public CartaoResponseDTO criarCartao(CartaoDTO cartaoDTO) {
         Usuario usuario = securityService.obterUsuarioLogado();
 
-        usuarioRepository.findById(usuario.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
-
-        // Criar o novo cartão
         Cartao cartao = new Cartao();
         cartao.setNome(cartaoDTO.nome());
         cartao.setLimiteTotal(cartaoDTO.limiteTotal());
-        cartao.setLimiteDisponivel(cartaoDTO.limiteTotal());  // Limite disponível é o mesmo que o total no momento da criação
+        cartao.setLimiteDisponivel(cartaoDTO.limiteTotal());
         cartao.setBandeira(cartaoDTO.bandeira());
         cartao.setVencimentoFatura(cartaoDTO.vencimentoFatura());
+        cartao.setDiaFechamentoFatura(cartaoDTO.diaFechamentoFatura());
         cartao.setUsuario(usuario);
+        Cartao cartaoSalvo = cartaoRepository.save(cartao);
 
-        // Atribuir um valor para 'diaFechamentoFatura' (necessário, se você tiver esse campo na sua lógica)
-        cartao.setDiaFechamentoFatura(cartaoDTO.diaFechamentoFatura());  // Por exemplo, fecha no dia 30 de cada mês (ajuste conforme a lógica)
-
-        // Salva o cartão no repositório
-        return cartaoRepository.save(cartao);
+        return CartaoMapper.toDto(cartaoSalvo);
     }
 
 
@@ -57,12 +52,7 @@ public class CartaoService {
         Usuario usuario = securityService.obterUsuarioLogado();
         List<Cartao> cartoes = cartaoRepository.findByUsuarioId(usuario.getId());
         return cartoes.stream()
-                .map(cartao -> new CartaoResponseDTO(
-                        cartao.getId(),
-                        cartao.getNome(),
-                        cartao.getLimiteDisponivel(),
-                        cartao.getBandeira()
-                ))
+                .map(CartaoMapper::toDto)
                 .collect(Collectors.toList());
     }
 

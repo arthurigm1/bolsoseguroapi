@@ -2,6 +2,7 @@ package bolsoseguroapi.Service;
 
 import bolsoseguroapi.Dto.Categoria.CategoriaDTO;
 import bolsoseguroapi.Exceptions.CategoriaLimitException;
+import bolsoseguroapi.Mapper.CategoriaMapper;
 import bolsoseguroapi.Model.Categoria;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Enum.TipoCategoria;
@@ -11,6 +12,7 @@ import bolsoseguroapi.Repository.UsuarioRepository;
 import bolsoseguroapi.Security.SecurityService;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +20,12 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+@RequiredArgsConstructor
 @Service
 public class CategoriaService {
-    @Autowired
-    private CategoriaRepository categoriaRepository;
 
-    @Autowired
-    private SecurityService securityService;
+    private final CategoriaRepository categoriaRepository;
+    private final SecurityService securityService;
 
     private static final List<Categoria> CATEGORIAS_FIXAS = List.of(
             new Categoria("Alimentação", true, TipoCategoria.DESPESA),
@@ -52,12 +52,12 @@ public class CategoriaService {
                 .forEach(categoriaRepository::save);
     }
 
-    public Categoria criarCategoriaPersonalizada(String nomeCategoria, TipoCategoria tipo) {
+    public CategoriaDTO criarCategoriaPersonalizada(String nomeCategoria, TipoCategoria tipo) {
         Usuario usuario = securityService.obterUsuarioLogado();
 
         // Verifica se o usuário já atingiu o limite de 5 categorias personalizadas
         if (categoriaRepository.countByUsuario(usuario) >= 20) {
-            throw new CategoriaLimitException("Você já atingiu o limite de 5 categorias personalizadas.");
+            throw new CategoriaLimitException("Você já atingiu o limite de 20 categorias personalizadas.");
         }
 
         // Verifica se já existe uma categoria com o mesmo nome e tipo para esse usuário
@@ -69,7 +69,8 @@ public class CategoriaService {
         Categoria categoria = new Categoria(nomeCategoria, false, tipo);
         categoria.setUsuario(usuario);
 
-        return categoriaRepository.save(categoria);
+        Categoria categoriaSalva = categoriaRepository.save(categoria);
+        return CategoriaMapper.toDto(categoriaSalva);
     }
 
     public List<CategoriaDTO> getCategoriasFixas() {

@@ -3,6 +3,7 @@ package bolsoseguroapi.Service;
 import bolsoseguroapi.Dto.Conta.ContaCadastroDTO;
 import bolsoseguroapi.Dto.Conta.ContaGetDTO;
 import bolsoseguroapi.Dto.Conta.ContaSaldoDTO;
+import bolsoseguroapi.Dto.Conta.ContaUpdateDTO;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Repository.ContaRepository;
@@ -62,21 +63,29 @@ public class ContaService {
 
 
 
-    public Optional<Conta> buscarContaPorId(UUID id) {
-        return contaRepository.findById(id);
-    }
 
 
-    public Conta atualizarConta(UUID id, Conta contaAtualizada) {
-        return contaRepository.findById(id)
-                .map(conta -> {
-                    conta.setBanco(contaAtualizada.getBanco());
-                    conta.setSaldo(contaAtualizada.getSaldo());
-                    conta.setUsuario(contaAtualizada.getUsuario());
-                    return contaRepository.save(conta);
-                })
+    public ContaUpdateDTO atualizarConta(UUID id, ContaUpdateDTO dto) throws AccessDeniedException {
+        Usuario usuario = securityService.obterUsuarioLogado();
+       Conta conta = contaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Conta não encontrada com o ID: " + id));
+        if (!conta.getUsuario().getId().equals(usuario.getId())) {
+            throw new AccessDeniedException("Você não tem permissão para atualizar esta conta");
+        }
+
+        if (dto.banco() != null) {
+            conta.setBanco(dto.banco());
+        }
+
+        if (dto.saldo() != null) {
+            conta.setSaldo(dto.saldo());
+        }
+
+        Conta contaAtualizada = contaRepository.save(conta);
+        return new ContaUpdateDTO(contaAtualizada.getBanco(), contaAtualizada.getSaldo());
     }
+
+
 
 
     public void deletarConta(UUID id) throws AccessDeniedException {
@@ -84,12 +93,10 @@ public class ContaService {
 
         Conta conta = contaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Conta não encontrada com o ID: " + id));
-
         // Verifica se a conta pertence ao usuário logado
         if (!conta.getUsuario().getId().equals(usuario.getId())) {
             throw new AccessDeniedException("Você não tem permissão para deletar esta conta");
         }
-
 
         contaRepository.deleteById(id);
     }

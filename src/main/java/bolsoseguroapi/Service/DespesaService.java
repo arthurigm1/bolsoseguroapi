@@ -66,7 +66,6 @@ public class DespesaService {
             throw new RuntimeException("É necessário informar um ID de conta ou cartão.");
         }
 
-        usuarioRepository.save(usuario);
         return despesaRepository.save(despesa);
     }
     private void registrarDespesaConta(Despesa despesa, Usuario usuario, UUID contaId) {

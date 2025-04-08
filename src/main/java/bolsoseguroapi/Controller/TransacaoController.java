@@ -4,6 +4,8 @@ import bolsoseguroapi.Dto.Transacao.BalancoMensalDetalhadoDTO;
 import bolsoseguroapi.Dto.Transacao.TransacaoDTO;
 import bolsoseguroapi.Dto.Transacao.TransacaoDetalhadaDTO;
 import bolsoseguroapi.Service.TransacaoService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -58,8 +60,8 @@ public class TransacaoController {
         return ResponseEntity.ok(transacoes);
     }
     @GetMapping("/relatorio")
-    public ResponseEntity<byte[]> gerarRelatorioTransacaoMensal(  @RequestParam int mes,
-                                                                  @RequestParam int ano) {
+    public ResponseEntity<byte[]> gerarRelatorioTransacaoMensal(       @RequestParam @Min(1) @Max(12) int mes,
+                                                                       @RequestParam @Min(2000) int ano) {
         try {
             byte[] pdfBytes = transacaoService.gerarRelatorioTransacaoMensal(mes,ano);
             return ResponseEntity.ok()

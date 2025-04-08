@@ -13,25 +13,27 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
-    @Autowired
-    private  UsuarioRepository userRepository;
+    private final  UsuarioRepository userRepository;
 
     private final AuthenticatedUserProvider authenticatedUserProvider;
 
     public Usuario obterPorEmail(String email) {
-        return userRepository.findByEmail(email);
+        Usuario usuario = userRepository.findByEmail(email);
+        if (usuario == null) {
+            throw new RuntimeException("Usuário não encontrado com email: " + email);
+        }
+        return usuario;
     }
 
 
     public SaldoResponseDTO obterSaldo() {
-        String email = authenticatedUserProvider.getAuthenticatedUsername();
-        Usuario usuario = userRepository.findByEmail(email);
+
+        Usuario usuario = getUsuarioLogado();
         return new SaldoResponseDTO(usuario.getNome(), usuario.getSaldoGeral());
     }
 
     public UsuarioInfoResponse getUsuario()
-    {   String email = authenticatedUserProvider.getAuthenticatedUsername();
-        Usuario usuario = userRepository.findByEmail(email);
+    {   Usuario usuario = getUsuarioLogado();
         return new UsuarioInfoResponse(usuario.getNome(),usuario.getEmail(),usuario.isEnabled(),usuario.getSaldoGeral());
 
     }
@@ -48,5 +50,8 @@ public class UsuarioService {
         userRepository.save(user);
         return true;
     }
-
+    private Usuario getUsuarioLogado() {
+        String email = authenticatedUserProvider.getAuthenticatedUsername();
+        return userRepository.findByEmail(email);
+    }
 }

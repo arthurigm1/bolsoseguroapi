@@ -16,6 +16,7 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -43,19 +44,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class TransacaoService {
 
-    @Autowired
-    private ReceitaRepository receitaRepository;
 
-    @Autowired
-    private DespesaRepository despesaRepository;
+    private final ReceitaRepository receitaRepository;
 
-    @Autowired
-    private SecurityService securityService;
-    @Autowired
-    private ContaRepository contaRepository;
+
+    private final DespesaRepository despesaRepository;
+
+
+    private final SecurityService securityService;
+
+    private final ContaRepository contaRepository;
 
     public List<TransacaoDTO> obterUltimasTransacoesDeTodasContas() {
         // Obter o usuário logado

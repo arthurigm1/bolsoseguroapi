@@ -38,6 +38,7 @@ public class AuthService {
     private final PasswordTokenRepository passwordResetTokenRepository;
     private final UsuarioRepository usuarioRepository;
     private final SecurityService securityService;
+
     public Object login(@Valid LoginRequestDto body) {
         Usuario user = this.repository.findByEmail(body.email());
         if (user == null) {

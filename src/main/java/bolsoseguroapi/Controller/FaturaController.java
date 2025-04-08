@@ -5,6 +5,7 @@ import bolsoseguroapi.Dto.Cartao.PagamentoFaturaRequest;
 import bolsoseguroapi.Exceptions.RelatorioException;
 import bolsoseguroapi.Model.FaturaCartao;
 import bolsoseguroapi.Service.FaturaService;
+import bolsoseguroapi.Validador.DataValidador;
 import com.itextpdf.text.DocumentException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,13 +63,7 @@ public class FaturaController {
 
         try {
 
-            if (mes < 1 || mes > 12) {
-                throw new IllegalArgumentException("Mês inválido. Deve ser entre 1 e 12.");
-            }
-
-            if (ano < 2020 || ano > LocalDate.now().getYear() + 1) {
-                throw new IllegalArgumentException("Ano inválido.");
-            }
+            DataValidador.validarMesEAno(mes, ano);
 
             byte[] pdfBytes = faturaService.exportarFaturasPorMes(cartaoId, mes, ano);
 

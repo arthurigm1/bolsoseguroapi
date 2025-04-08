@@ -12,6 +12,7 @@ import bolsoseguroapi.Repository.UsuarioRepository;
 import bolsoseguroapi.Security.SecurityService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,19 +20,20 @@ import java.math.BigDecimal;
 
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
-public class ReceitaService {
-    @Autowired
-    private  ReceitaRepository receitaRepository;
-    @Autowired
-    private  ContaRepository contaRepository;
-    @Autowired
-    private  UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private CategoriaRepository categoriaRepository;
-    @Autowired
-    private SecurityService securityService;
+@RequiredArgsConstructor
+public class ReceitaService {
+
+    private final  ReceitaRepository receitaRepository;
+
+    private final  ContaRepository contaRepository;
+
+    private final  UsuarioRepository usuarioRepository;
+
+
+    private final CategoriaRepository categoriaRepository;
+
+    private final SecurityService securityService;
 
 
     public Receita adicionarReceita(ReceitaDTO receitaDTO) {
