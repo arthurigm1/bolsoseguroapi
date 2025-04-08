@@ -7,6 +7,7 @@ import bolsoseguroapi.Model.MetaFinanceira;
 import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Repository.MetaFinanceiraRepository;
 import bolsoseguroapi.Security.SecurityService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
@@ -50,17 +51,26 @@ public class MetaFinanceiraService {
                 .collect(Collectors.toList());
     }
 
-    // Atualizar o valor poupado na meta
-    public MetaFinanceiraResponseDTO editarMeta(UUID metaId, MetaFinanceiraUpdateDTO dto) {
+
+    public void editarMeta(UUID metaId, MetaFinanceiraUpdateDTO dto) {
         MetaFinanceira meta = metaRepository.findById(metaId)
-                .orElseThrow(() -> new RuntimeException("Meta não encontrada!"));
+                .orElseThrow(() -> new EntityNotFoundException("Meta não encontrada!"));
 
-        meta.setValorAtual(dto.valorAtual());
-        meta.setValorMeta(dto.valorMeta());
+        if (dto.valorAtual() != null) {
+            meta.setValorAtual(dto.valorAtual());
+        }
+
+        if (dto.valorMeta() != null) {
+            meta.setValorMeta(dto.valorMeta());
+        }
+
+        if (dto.nomeMeta() != null && !dto.nomeMeta().isBlank()) {
+            meta.setNome(dto.nomeMeta());
+        }
+
         metaRepository.save(meta);
-
-        return converterParaDTO(meta);
     }
+
 
     public void deletarMeta(UUID metaId) {
         MetaFinanceira meta = metaRepository.findById(metaId)

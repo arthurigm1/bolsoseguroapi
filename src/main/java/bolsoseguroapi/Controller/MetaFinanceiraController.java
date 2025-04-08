@@ -34,10 +34,11 @@ public class MetaFinanceiraController {
 
 
     @PutMapping("/{metaId}")
-    public ResponseEntity<MetaFinanceiraResponseDTO> editarMeta(
+    public ResponseEntity<MetaFinanceiraUpdateDTO> editarMeta(
             @PathVariable UUID metaId,
             @RequestBody MetaFinanceiraUpdateDTO updateDTO) {
-        return ResponseEntity.ok(metaService.editarMeta(metaId, updateDTO));
+        metaService.editarMeta(metaId, updateDTO);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{metaId}")
