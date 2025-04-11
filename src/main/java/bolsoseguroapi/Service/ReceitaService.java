@@ -10,10 +10,9 @@ import bolsoseguroapi.Repository.ContaRepository;
 import bolsoseguroapi.Repository.ReceitaRepository;
 import bolsoseguroapi.Repository.UsuarioRepository;
 import bolsoseguroapi.Security.SecurityService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

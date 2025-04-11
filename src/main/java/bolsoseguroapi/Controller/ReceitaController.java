@@ -18,8 +18,6 @@ public class ReceitaController {
 
     private final ReceitaService receitaService;
 
-
-
     @PostMapping
     public ResponseEntity<ReceitaDTO> adicionarReceita(@RequestBody ReceitaDTO receitaDTO) {
          receitaService.adicionarReceita(receitaDTO);
