@@ -1,5 +1,6 @@
 package bolsoseguroapi.Repository;
 
+import bolsoseguroapi.Model.Categoria;
 import bolsoseguroapi.Model.Conta;
 import bolsoseguroapi.Model.Receita;
 import bolsoseguroapi.Model.Usuario;
@@ -21,6 +22,7 @@ public interface ReceitaRepository extends JpaRepository<Receita, UUID> {
 
     @Query("SELECT r FROM Receita r WHERE r.conta IN :contas ORDER BY r.dataCadastro DESC")
     List<Receita> findReceitasByContasOrderByDataCadastroDesc(@Param("contas") List<Conta> contas);
+    List<Receita> findByContaUsuarioAndCategoria(Usuario usuario, Categoria categoria);
 
     @Query("""
         SELECT COALESCE(SUM(d.valor), 0) 

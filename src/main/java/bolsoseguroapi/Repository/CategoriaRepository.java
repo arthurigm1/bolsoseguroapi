@@ -19,6 +19,8 @@ public interface CategoriaRepository extends JpaRepository<Categoria, Long  > {
 
     boolean existsByNomeAndUsuario(String nome, Usuario usuario);
 
+    Optional<Categoria> findByNomeIgnoreCase(String nome);
+
     List<Categoria> findByUsuario(Usuario usuario);
 
     @Query("SELECT c FROM Categoria c WHERE c.usuario IS NULL")

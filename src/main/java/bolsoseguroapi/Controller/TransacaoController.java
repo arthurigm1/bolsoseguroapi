@@ -48,7 +48,7 @@ public class TransacaoController {
     }
     @GetMapping("/investimento")
     public BigDecimal obterSaldoPorCategoria() {
-        return transacaoService.calcularSaldoCategoria();
+        return transacaoService.calcularSaldoCategoriaInvestimento();
     }
 
     @GetMapping("/saldosMes")

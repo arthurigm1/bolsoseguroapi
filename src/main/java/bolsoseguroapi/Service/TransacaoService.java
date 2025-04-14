@@ -3,13 +3,11 @@ package bolsoseguroapi.Service;
 import bolsoseguroapi.Dto.Transacao.BalancoMensalDetalhadoDTO;
 import bolsoseguroapi.Dto.Transacao.TransacaoDTO;
 import bolsoseguroapi.Dto.Transacao.TransacaoDetalhadaDTO;
-import bolsoseguroapi.Model.Conta;
-import bolsoseguroapi.Model.Despesa;
-import bolsoseguroapi.Model.Receita;
+import bolsoseguroapi.Model.*;
+import bolsoseguroapi.Repository.CategoriaRepository;
 import bolsoseguroapi.Repository.ContaRepository;
 import bolsoseguroapi.Repository.DespesaRepository;
 import bolsoseguroapi.Repository.ReceitaRepository;
-import bolsoseguroapi.Model.Usuario;
 import bolsoseguroapi.Security.SecurityService;
 
 import com.itextpdf.text.*;
@@ -29,7 +27,7 @@ import org.springframework.util.StringUtils;
 import java.io.ByteArrayOutputStream;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -38,10 +36,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -54,6 +49,7 @@ public class TransacaoService {
 
     private final DespesaRepository despesaRepository;
 
+    private final CategoriaRepository categoriaRepository;
 
     private final SecurityService securityService;
 
@@ -165,21 +161,23 @@ public class TransacaoService {
         return balancoMensal;
     }
 
-    public BigDecimal calcularSaldoCategoria() {
-        Usuario usuario = securityService.obterUsuarioLogado(); // Obter o usuário logado
+    public BigDecimal calcularSaldoCategoriaInvestimento() {
+        Usuario usuario = securityService.obterUsuarioLogado();
         if (usuario == null) {
             throw new RuntimeException("Usuário não encontrado");
         }
 
-        // Buscar as receitas do usuário logado pela conta e categoria (usando o ID da categoria)
-        List<Receita> receitas = receitaRepository.findByContaUsuarioAndCategoriaId(usuario, 13L);
+        Categoria categoria = categoriaRepository.findByNomeIgnoreCase("Investimento")
+                .orElseThrow(() -> new RuntimeException("Categoria 'Investimento' não encontrada"));
 
-        // Somar os valores das receitas com BigDecimal para evitar problemas de precisão
+        List<Receita> receitas = receitaRepository.findByContaUsuarioAndCategoria(usuario, categoria);
+
         return receitas.stream()
-                .map(Receita::getValor)  // Extrai o valor de cada receita
-                .filter(valor -> valor != null)  // Filtra valores nulos, caso haja
-                .reduce(BigDecimal.ZERO, BigDecimal::add);  // Soma os valores
+                .map(Receita::getValor)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
 
     public List<TransacaoDetalhadaDTO> obterTransacoesPorMes(int mes, int ano) {
         // Obter o usuário logado
