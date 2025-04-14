@@ -167,8 +167,8 @@ public class TransacaoService {
             throw new RuntimeException("Usuário não encontrado");
         }
 
-        Categoria categoria = categoriaRepository.findByNomeIgnoreCase("Investimento")
-                .orElseThrow(() -> new RuntimeException("Categoria 'Investimento' não encontrada"));
+        Categoria categoria = categoriaRepository.findByNomeIgnoreCase("Investimentos")
+                .orElseThrow(() -> new RuntimeException("Categoria 'Investimentos' não encontrada"));
 
         List<Receita> receitas = receitaRepository.findByContaUsuarioAndCategoria(usuario, categoria);
 
