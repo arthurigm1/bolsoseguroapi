@@ -16,7 +16,7 @@ public class MailService {
     @Autowired
     private JavaMailSender emailSender;
 
-    private String verifyURL = "https://bolsosegeguro.netlify.app/verify?code=";
+    private String verifyURL = "https://bolsoseguro.netlify.app/verify?code=";
 
     public void sendVerificationEmail(Usuario user) throws MessagingException, UnsupportedEncodingException {
         String toAddres = user.getEmail();

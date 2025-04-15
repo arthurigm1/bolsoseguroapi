@@ -30,7 +30,7 @@ public class PasswordResetService {
     @Autowired
     private JavaMailSender mailSender;
 
-    private String verifyURL = "https://bolsosegeguro.netlify.app/reset-password?token=";
+    private String verifyURL = "https://bolsoseguro.netlify.app/reset-password?token=";
     public void enviarEmailRecuperacao(String email) throws MessagingException, UnsupportedEncodingException {
         Usuario usuario = usuarioRepository.findByEmail(email);
         String token = UUID.randomUUID().toString();
