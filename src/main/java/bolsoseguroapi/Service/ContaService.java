@@ -35,6 +35,7 @@ public class ContaService {
         conta.setUsuario(usuario);
         conta.setBanco(contaDTO.banco());
         conta.setSaldo(contaDTO.saldo());
+        conta.setBancoTipo(contaDTO.bancoTipo());
         return contaRepository.save(conta);
     }
 

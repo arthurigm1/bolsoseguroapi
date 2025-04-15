@@ -1,5 +1,7 @@
 package bolsoseguroapi.Model;
 
+import bolsoseguroapi.Model.Enum.BancoTipo;
+import bolsoseguroapi.Model.Enum.TipoCategoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,6 +31,8 @@ public class Conta {
     @Column(nullable = false, length = 50)
     private String banco;
 
+    @Enumerated(EnumType.STRING)
+    private BancoTipo bancoTipo;
 
     @Column(nullable = false)
     private BigDecimal saldo = BigDecimal.ZERO;
