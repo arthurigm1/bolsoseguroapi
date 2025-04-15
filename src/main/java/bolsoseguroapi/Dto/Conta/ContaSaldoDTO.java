@@ -1,5 +1,6 @@
 package bolsoseguroapi.Dto.Conta;
 
+import bolsoseguroapi.Model.Enum.BancoTipo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,5 +16,6 @@ public class ContaSaldoDTO {
     private UUID id;
     private String nome;
     private BigDecimal saldo;
+    private BancoTipo bancoTipo;
 
 }

@@ -58,7 +58,7 @@ public class ContaService {
         List<Conta> contas = contaRepository.findByUsuario(usuario); // Substitua com sua lógica de consulta
 
         return contas.stream()
-                .map(conta -> new ContaSaldoDTO(conta.getId(), conta.getBanco(),conta.getSaldo()))
+                .map(conta -> new ContaSaldoDTO(conta.getId(), conta.getBanco(),conta.getSaldo(),conta.getBancoTipo()))
                 .collect(Collectors.toList());
     }
 
